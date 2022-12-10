@@ -18,10 +18,10 @@ export const asyncRoutes = [
   departmentsRouter,
   employeesRouter,
   permissionRouter,
-  attendancesRouter,
-  salarysRouter,
   settingRouter,
-  socialRouter
+  socialRouter,
+  attendancesRouter,
+  salarysRouter
 ]
 export const constantRoutes = [
   {
@@ -47,28 +47,28 @@ export const constantRoutes = [
       meta: { title: '主页', icon: 'dashboard' }
     }]
   },
-
-  // 404 page must be placed at the end !!!
-  { path: '*', redirect: '/404', hidden: true },
-  { path: '/import',
+  {
+    path: '/import',
     component: Layout,
     hidden: true,
     children: [{
       path: '',
       component: () => import('@/views/import')
     }]
-  }
+  },
+  // 404 page must be placed at the end !!!
+  { path: '*', redirect: '/404', hidden: true }
 ]
 
 const createRouter = () => new Router({
-  // mode: 'history', // require service support
+  mode: 'history',
+  base: '/hr/',
   scrollBehavior: () => ({ y: 0 }),
-  routes: [...constantRoutes, ...asyncRoutes]
+  routes: [...constantRoutes, ...asyncRoutes]// 接口多人使用影响 暂不移除临时移动路由
 })
 
 const router = createRouter()
 
-// Detail see: https://github.com/vuejs/vue-router/issues/1234#issuecomment-357941465
 export function resetRouter() {
   const newRouter = createRouter()
   router.matcher = newRouter.matcher // reset router

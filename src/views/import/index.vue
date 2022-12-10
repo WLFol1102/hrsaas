@@ -3,10 +3,10 @@
 </template>
 
 <script>
+import { importEmployees } from '@/api/employees'
 export default {
   methods: {
-    success({ header, results }) {
-      debugger
+    async  success({ header, results }) {
       // 数据中英转置
       const userRelations = {
         '入职日期': 'timeOfEntry',
@@ -15,12 +15,33 @@ export default {
         '转正日期': 'correctionTime',
         '工号': 'workNumber'
       }
-      results.forEach(itrm => {
-        const userInfo = {}
+      const newArr = []
+      results.forEach(item => {
+        var userInfo = {}
         Object.keys(item).forEach(key => {
-          userInfo[userRelations[key]] = item[key]
+          if (userRelations[key] === 'timeOfEntry' || userRelations[key] === 'correctionTime') {
+            userInfo[userRelations[key]] = new Date(this.formatDate(item[key], '/'))
+          } else {
+            userInfo[userRelations[key]] = item[key]
+          }
         })
+        newArr.push(userInfo)
       })
+      await importEmployees(newArr)
+      this.$message.success('导入成功')
+      this.$router.back()
+    },
+    // 转化Excel的日期格式
+    formatDate(numb, format) {
+      const time = new Date((numb - 1) * 24 * 3600000 + 1)
+      time.setYear(time.getFullYear() - 70)
+      const year = time.getFullYear() + ''
+      const month = time.getMonth() + 1 + ''
+      const date = time.getDate() - 1 + ''
+      if (format && format.length === 1) {
+        return year + format + month + format + date
+      }
+      return year + (month < 10 ? '0' + month : month) + (date < 10 ? '0' + date : date)
     }
   }
 }
